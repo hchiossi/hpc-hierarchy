@@ -14,14 +14,15 @@ default_vars = dir().copy()
 
 #%% Change here the variables to the experiment
 
-#where all processed data is. The folder structure is path/animalID/animalID-date/
+#where all processed data is. The folder structure of the experimental data has to be path/animalID/date/
+#.coord files should be directly in path/animalID/ since they are shared between dates
 path = '/example/processing/'
 
 #where behavior data is. Use .csv files, as in the example provided.
 bhv_path = '/example/behaviour/'
 
 #where the population objects are saved. Check the script example_clusterpopulation.py for more information
-pop_path = '/example/analysis/clu_measures/'
+pop_path = '/example/clu_populations/'
 
  # in Hz, rate of original neural recording. It should match the shifts file
 rec_rate = 24000

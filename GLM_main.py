@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# fit GLM to single cell responses
-# analyze parameters as a "rate map" with speed regressed out
+"""
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
+Fits GLM to single neuron responses
+Parameters can be used to generate a "ratemap" with speed regressed out
+"""
 
 import json
 import pickle

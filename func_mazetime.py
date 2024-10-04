@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 29 10:07:38 2021
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
 
-@author: hchiossi
+A list of functions that calculate animal time on the maze, around rewards, etc
 """
 
 import numpy as np

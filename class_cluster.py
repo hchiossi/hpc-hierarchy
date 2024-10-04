@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 22 12:42:39 2022
 
-@author: helo
+"""
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
 """
 
 

@@ -2,6 +2,9 @@
 # coding: utf-8
 
 '''
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
+
 This script creates files in the format they are used in the GLM pipeline:
 list of positions, speeds, spikes, and trial number for each time bin, 
 filtered by periods where animal was in the maze and running
@@ -54,7 +57,7 @@ with open(info_file, 'r') as openfile:
 
 animals, dates = exp_info['animals'], exp_info['dates']
 
-#%% load data
+#%% Main loop
 for a, animal in enumerate(animals):
     for d,date in enumerate(dates[a]):
         # Load data

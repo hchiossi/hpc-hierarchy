@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 24 10:47:06 2022
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
 
-@author: helo
+Example on how to generate ClusterPopulation objects
 """
 
 import numpy as np

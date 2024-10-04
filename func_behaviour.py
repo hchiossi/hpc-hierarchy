@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr  1 12:01:09 2021
-
-@author: hchiossi
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
+Functions to use with .csv behaviour files, for examples check the link above.
 """
 
 import pandas as pd

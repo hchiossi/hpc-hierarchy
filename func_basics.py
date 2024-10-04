@@ -1,6 +1,12 @@
-## basics: load clu and res, compute speed and heading, compute rate maps
+
+"""
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
+
+## basics: load clu and res, compute speed and direction, compute rate maps
 ## you can use this as a library or copy/paste the scripts you need
 ## notice that they are calculated for whls at 50Hz and 4cm spatial binning
+"""
 
 import numpy as np
 import scipy.ndimage as nd

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Feb 24 11:39:56 2023
+Code from paper Chiossi et al, 2024
+Source: https://github.com/hchiossi/hpc-hierarchy
 
-@author: helo
 """
-
 import numpy as np
 import pandas as pd
 
@@ -43,7 +42,8 @@ def lda_projections(pop_vec_flat,lda_var):
     return projections
 
 def popvec_perpos_fromedges(all_cells, lin_whl, lin_speed, whl_shifts, pos_edges, speed_thres=3, whl_rate=50, ntrials=40, \
-                  with_labels=False, behaviour=None, exclude_untracked=True, shift_pos=False, dir_filter=False, move_dir=None):
+                  with_labels=False, behaviour=None, exclude_untracked=True, shift_pos=False, dir_filter=False, move_dir=None,\
+                      coarse_pos_edges=None):
 
     """
     
@@ -83,6 +83,8 @@ def popvec_perpos_fromedges(all_cells, lin_whl, lin_speed, whl_shifts, pos_edges
                                                                                 a move_dir array to be provided. The default is False.
     move_dir : 1D array, optional
         Movement direction (-1, 1) of the animal. Array of length where N is the number of frames. Should be the same length as lin_whl
+    coarse_pos_edges : list, optional
+        If provided, it will also output labels for a position bining defined by the bin edges in this list
 
     Returns
     -------
@@ -137,9 +139,69 @@ def popvec_perpos_fromedges(all_cells, lin_whl, lin_speed, whl_shifts, pos_edges
         for trial in range(ntrials):
             trial_cat = behaviour.iloc[trial]['Start']+behaviour.iloc[trial]['Context']
             for p in range(len(pos_edges)-1):
-                vec_labels.loc[len(vec_labels)] = [trial,str(p),trial_cat[0],trial_cat[1],trial_cat,behaviour.iloc[trial]['Correct'],behaviour.iloc[trial]['error_type']]      
+                vec_labels.loc[len(vec_labels)] = [trial,str(p),trial_cat[0],trial_cat[1],trial_cat,behaviour.iloc[trial]['Correct'],behaviour.iloc[trial]['error_type']]  
+        #Here Region refers to coarse-grained positions
+        if  coarse_pos_edges!=None:
+            vec_labels['Region'] = np.digitize(vec_labels['Position'].to_numpy().astype(int), coarse_pos_edges).astype(str)
         if exclude_untracked:
             vec_labels = vec_labels.drop(nan_row)
         return pop_vec_flat, vec_labels
     else:
         return pop_vec_flat
+
+def load_pvs(a,d, data_source,expinfo,pos_binsize,glm_path=None):
+    
+    import pickle
+    
+    animal = expinfo['animals'][a]
+    date = expinfo['dates'][a][d]
+    ntrials=expinfo['ntrials'][a][d]
+    nposbins=int(expinfo['max_pos']/pos_binsize)
+    
+    
+    if data_source == 'original':
+        with open(expinfo['pop_path'] + animal + '_' + date + '_population.pkl', 'rb') as file:
+            all_cells = pickle.load(file)        
+        npyr = np.sum(all_cells.cell_types=='p1')
+        ratemaps = np.zeros((all_cells.nclusters,ntrials,nposbins))
+        for cell in range(all_cells.nclusters):
+              ratemaps[cell,:,:]=all_cells.unit[cell].ratemap_pertrial[:ntrials,:]
+        ratemaps = ratemaps[all_cells.cell_types=='p1',:,:]
+        ratemaps[np.isnan(ratemaps)]=0
+        #since the PVs are calculated per position/trial they are the same as the ratemap per trial
+        pop_vecs = ratemaps 
+
+    elif data_source == 'GLM':            
+        pop_vecs=np.zeros((npyr,ntrials,nposbins))     
+        params = np.load(glm_path+f'{animal}_{date}_params.npy')            
+        #add all position parameters and the constant parameter, but not those for the speed bins
+        #the parameters from the GLM are log firing rates, so take the exponential to get values in Hz
+        ratemaps = [params[i,:ntrials*nposbins].reshape(ntrials,nposbins)+params[i,-1] for i in range(npyr)]
+        for cell in range(npyr):
+            pop_vecs[cell]=np.exp(ratemaps[cell])
+            
+    else:
+        raise Exception('Data source unknown')
+        
+    npyr=pop_vecs.shape[0]
+
+    #Flatten the array to 2D, nsamples x nneurons as required by sklearn
+    pop_vec_flat = pop_vecs.reshape(npyr,-1).T
+    pop_vec_flat[np.isnan(pop_vec_flat)]=0
+    
+    return pop_vec_flat
+
+
+def get_vec_labels(behaviour, ntrials, npos, coarse_pos_edges):
+    #get labels for population vectors already calculated for ntrials and npos
+    #coarsepos_edges are the bin edges for large position bins, in case you want to label nearby positions all the same label
+    
+    vec_labels = pd.DataFrame(columns=['Trial#','Position','Side','Context','Category','Correct','Error_type']) #label per datapoint, to be used for decoding
+    for trial in range(ntrials):
+        trial_cat = behaviour.iloc[trial]['Start']+behaviour.iloc[trial]['Context']
+        for p in range(npos):
+            vec_labels.loc[len(vec_labels)] = [trial,str(p),trial_cat[0],trial_cat[1],trial_cat,behaviour.iloc[trial]['Correct'],behaviour.iloc[trial]['error_type']]     
+    #Here Region refers to coarse-grained positions
+    vec_labels['Region'] = np.digitize(vec_labels['Position'].to_numpy().astype(int), coarse_pos_edges).astype(str)
+    
+    return vec_labels

@@ -65,7 +65,7 @@ def fit_all(X,Y,lams):
 info_file ='/example/hpc-hierarchy/fullexp_info.json'
 
 #Path where you saved the files from GLM_data_prep.py
-data_prep_outpath = '/example/ratemapsGLM/'
+data_prep_outpath = '/example/GLMfit/'
 
 # animal and date to analyse (as a number within [0,#animals[ and  [0,#dates[ )
 #we recomend running this for one session at a time, as it is a heavy computation. You can also parallelise for multiple sessions using a bash script

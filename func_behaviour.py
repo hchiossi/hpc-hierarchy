@@ -17,7 +17,7 @@ def load_behaviour(path, animal_list, dates):
         rat_data = []
         animal = animal_list[i]
         for day in dates[i]:
-            datatemp=pd.read_csv(path+animal+'-' + day + "_witherrors.csv")
+            datatemp=pd.read_csv(path+animal+'-' + day + ".csv")
             datatemp['Date']=day
             datatemp['Animal']=animal
             rat_data.append(datatemp)
